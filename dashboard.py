@@ -2376,3 +2376,17 @@ import sys; sys.modules['readline'] = None
 # Local Variables:
 # mode: python
 # End:
+
+# Custom command to intercept gdb builtin command 'f frame-selection-spec'
+class CustomFrameCommand(gdb.Command):
+    '''Select frame and refresh dashboard.'''
+    def __init__(self):
+        super().__init__('f', gdb.COMMAND_USER)
+        global dashboard
+        self.dashboard = dashboard
+
+    def invoke(self, args, from_tty):
+        gdb.execute(f'frame {args}', from_tty=from_tty)
+        self.dashboard.on_stop(None)
+
+CustomFrameCommand()
